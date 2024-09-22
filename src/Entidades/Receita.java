@@ -5,14 +5,12 @@ public class Receita {
     private String descricao;
     private double valor;
 
-    
     public Receita(int id, String descricao, double valor) {
         this.id = id;
         this.descricao = descricao;
         this.valor = valor;
     }
 
-    
     public int getId() {
         return id;
     }

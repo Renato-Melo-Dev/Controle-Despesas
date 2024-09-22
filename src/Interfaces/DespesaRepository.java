@@ -1,11 +1,11 @@
 package Interfaces;
 
 import Entidades.Despesa;
+import java.util.List;
 
 public interface DespesaRepository {
-    Despesa buscarPorId(int id);
-    void salvar(Despesa despesa);
-    void adicionarDespesa(Despesa despesa);
-    void obterTotalDespesas(Despesa despesa);
+    void adicionar(Despesa despesa);
+    List<Despesa> listar();
+    void atualizar(Despesa despesa);
+    void deletar(int id);
 }
-

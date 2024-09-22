@@ -3,11 +3,9 @@ import Entidades.Receita;
 import Entidades.Usuario;
 import Interfaces.DespesaRepository;
 import Interfaces.ReceitaRepository;
-import Interfaces.RelatorioRepository;
 import Interfaces.UsuarioRepository;
 import Repository.DespesaRepositorio;
 import Repository.ReceitaRepositorio;
-import Repository.RelatorioRepositorio;
 import Repository.UsuarioRepositorio;
 import Services.CalcularSaldoTotal;
 import Services.DespesaService;
@@ -15,6 +13,7 @@ import Services.ReceitaService;
 import Services.RelatorioService;
 import Services.UsuarioService;
 import Utils.GeradorId;
+import Utils.InputUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -24,12 +23,11 @@ public class Main {
         DespesaRepository despesaRepository = new DespesaRepositorio();
         ReceitaRepository receitaRepository = new ReceitaRepositorio();
         UsuarioRepository usuarioRepository = new UsuarioRepositorio();
-        RelatorioRepository relatorioRepository = new RelatorioRepositorio();
 
         DespesaService despesaService = new DespesaService(despesaRepository);
         ReceitaService receitaService = new ReceitaService(receitaRepository);
         UsuarioService usuarioService = new UsuarioService(usuarioRepository);
-        RelatorioService relatorioService = new RelatorioService(relatorioRepository);
+        RelatorioService relatorioService = new RelatorioService();
 
         List<Despesa> listaDespesas = new ArrayList<>();
         List<Receita> listaReceitas = new ArrayList<>();
@@ -45,7 +43,7 @@ public class Main {
 
             int escolha = scanner.nextInt();
             scanner.nextLine(); 
-            
+
             switch (escolha) {
                 case 1 -> {
                     System.out.println("Preencha os dados.");
@@ -77,74 +75,62 @@ public class Main {
             while (continuarExecucao) {
                 System.out.println("\n--- Sistema de Gerenciamento de Custos ---");
                 System.out.println("1. Adicionar Despesa");
-                System.out.println("2. Adicionar Receita");
-                System.out.println("3. Consultar Saldo");
-                System.out.println("4. Gerar Relatório");
-                System.out.println("5. Sair");
+                System.out.println("2. Listar Despesas");
+                System.out.println("3. Atualizar Despesa");
+                System.out.println("4. Deletar Despesa");
+                System.out.println("5. Consultar Saldo");
+                System.out.println("6. Gerar Relatório");
+                System.out.println("7. Sair");
                 System.out.print("Escolha uma opção: ");
-                
+
                 int opcao = scanner.nextInt();
-                scanner.nextLine(); 
+                scanner.nextLine();
 
                 switch (opcao) {
                     case 1 -> {
-                        boolean valorValido = false;
-                        double valorDespesa = 0;
-                        String descricaoDespesa;
-
                         System.out.print("Digite a descrição da despesa: ");
-                        descricaoDespesa = scanner.nextLine();
+                        String descricaoDespesa = scanner.nextLine();
+                        double valorDespesa = InputUtils.obterValor(scanner);
 
-                        while (!valorValido) {
-                            try {
-                                System.out.print("Digite o valor da despesa: ");
-                                valorDespesa = scanner.nextDouble();
-                                scanner.nextLine();
-                                valorValido = true; // O sistema sai do loop se tudo estiver certo
-                            } catch (Exception e) {
-                                System.out.println("Valor inválido. Por favor, digite um número válido.");
-                                scanner.nextLine(); // Aqui o sistema volta a pedir pro usuário digitar se ele errar 
-                            }
-                        }
                         Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa);
                         despesaService.adicionarDespesa(novaDespesa);
                         listaDespesas.add(novaDespesa);
                         System.out.println("Despesa adicionada com sucesso!");
                     }
                     case 2 -> {
-                        boolean valorValido = false;
-                        double valorReceita = 0;
-                        String descricaoReceita;
-
-                        System.out.print("Digite a descrição da receita: ");
-                        descricaoReceita = scanner.nextLine();
-
-                        while (!valorValido) {
-                            try {
-                                System.out.print("Digite o valor da receita: ");
-                                valorReceita = scanner.nextDouble();
-                                scanner.nextLine(); 
-                                valorValido = true; // Caso o valor inserido estiver correto o loop será encerrado
-                            } catch (Exception e) {
-                                System.out.println("Valor inválido. Por favor, digite um número válido.");
-                                scanner.nextLine(); // Se o usuário errar, o sistema apaga tudo e volta a pedir o valor
-                            }
+                        List<Despesa> despesas = despesaService.listarDespesas();
+                        System.out.println("Lista de Despesas:");
+                        for (Despesa d : despesas) {
+                            System.out.println(d.getId() + ": " + d.getDescricao() + " - R$" + d.getValor());
                         }
-                        
-                        Receita novaReceita = new Receita(GeradorId.gerarIdReceita(), descricaoReceita, valorReceita);
-                        receitaService.adicionarReceita(novaReceita);
-                        listaReceitas.add(novaReceita);
-                        System.out.println("Receita adicionada com sucesso!");
                     }
                     case 3 -> {
+                        System.out.print("Digite o ID da despesa a ser atualizada: ");
+                        int id = scanner.nextInt();
+                        scanner.nextLine(); 
+                        System.out.print("Digite a nova descrição da despesa: ");
+                        String novaDescricao = scanner.nextLine();
+                        double novoValor = InputUtils.obterValor(scanner);
+
+                        Despesa despesaAtualizada = new Despesa(id, novaDescricao, novoValor);
+                        despesaService.atualizarDespesa(despesaAtualizada);
+                        System.out.println("Despesa atualizada com sucesso!");
+                    }
+                    case 4 -> {
+                        System.out.print("Digite o ID da despesa a ser deletada: ");
+                        int id = scanner.nextInt();
+                        despesaService.deletarDespesa(id);
+                        System.out.println("Despesa deletada com sucesso!");
+                    }
+                    case 5 -> {
                         CalcularSaldoTotal calculadora = new CalcularSaldoTotal();
                         double saldoTotal = calculadora.calcularSaldoTotal(despesaService, receitaService, listaDespesas, listaReceitas);
                         System.out.println("Saldo: R$" + saldoTotal);
                     }
-                    case 4 -> {
+                    case 6 -> {
                         relatorioService.gerarRelatorio(listaDespesas, listaReceitas);
                     }
-                    case 5 -> {
+                    case 7 -> {
                         System.out.println("Encerrando o programa. Até mais!");
                         continuarExecucao = false;
                     }

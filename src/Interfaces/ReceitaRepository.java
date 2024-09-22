@@ -1,9 +1,11 @@
 package Interfaces;
 
 import Entidades.Receita;
+import java.util.List;
 
 public interface ReceitaRepository {
-    void salvarReceita(Receita receita);
-    Receita buscarReceitaPorId(long id);
-    double obterTotalReceitas(Receita receita);
+    void adicionar(Receita receita);
+    List<Receita> listar();
+    void atualizar(Receita receita);
+    void deletar(int id);
 }

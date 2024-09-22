@@ -6,37 +6,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DespesaRepositorio implements DespesaRepository {
-    public List<Despesa> despesas;
-
-    public DespesaRepositorio() {
-        this.despesas = new ArrayList<>();
-    }
+    private List<Despesa> despesas = new ArrayList<>();
 
     @Override
-    public void salvar(Despesa despesa) {
+    public void adicionar(Despesa despesa) {
         despesas.add(despesa);
     }
 
     @Override
-    public Despesa buscarPorId(int id) {
-        for (Despesa d : despesas) {
-            if (d.getId() == id) {
-                return d;
+    public List<Despesa> listar() {
+        return despesas;
+    }
+
+    @Override
+    public void atualizar(Despesa despesa) {
+        for (int i = 0; i < despesas.size(); i++) {
+            if (despesas.get(i).getId() == despesa.getId()) {
+                despesas.set(i, despesa);
+                break;
             }
         }
-        return null;
     }
-    @Override
-    public void adicionarDespesa(Despesa despesa) {
-        despesas.add(despesa);
-}
-    @Override
-    public void obterTotalDespesas(Despesa despesa) {
-        double total = 0.0;
-        for (Despesa d : despesas) {
-            total += d.getValor();
-        }
-        System.out.println("Total de despesas: " + total);
-}
-}
 
+    @Override
+    public void deletar(int id) {
+        despesas.removeIf(d -> d.getId() == id);
+    }
+
+    public List<Despesa> getDespesas() {
+        return despesas;
+    }
+
+    public void setDespesas(List<Despesa> despesas) {
+        this.despesas = despesas;
+    }
+}

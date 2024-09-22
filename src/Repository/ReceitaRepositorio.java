@@ -1,38 +1,43 @@
 package Repository;
 
-
 import Entidades.Receita;
 import Interfaces.ReceitaRepository;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReceitaRepositorio implements ReceitaRepository {
-        private final List<Receita> listaReceitas;
-    
-        public ReceitaRepositorio() {
-            this.listaReceitas = new ArrayList<>();
-        }
-    @Override
-    public void salvarReceita(Receita receita) {
-        listaReceitas.add(receita);
-        }
-    
+    private List<Receita> receitas = new ArrayList<>();
 
     @Override
-    public Receita buscarReceitaPorId(long id) {
-        return listaReceitas.stream()
-                .filter(r -> r.getId() == id)
-                .findFirst()
-                .orElse(null);
+    public void adicionar(Receita receita) {
+        receitas.add(receita);
     }
 
     @Override
-    public double obterTotalReceitas(Receita receita) {
-        double total = 0.0;
-        for (Receita r : listaReceitas) {
-            total += r.getValor();
-        }
-        return total;
+    public List<Receita> listar() {
+        return receitas;
     }
- 
+
+    @Override
+    public void atualizar(Receita receita) {
+        for (int i = 0; i < receitas.size(); i++) {
+            if (receitas.get(i).getId() == receita.getId()) {
+                receitas.set(i, receita);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void deletar(int id) {
+        receitas.removeIf(r -> r.getId() == id);
+    }
+
+    public List<Receita> getReceitas() {
+        return receitas;
+    }
+
+    public void setReceitas(List<Receita> receitas) {
+        this.receitas = receitas;
+    }
 }

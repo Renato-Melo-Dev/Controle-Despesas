@@ -5,6 +5,7 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
+
     public Usuario(int id, String nome, String email, String senha) {
         this.id = id;
         this.nome = nome;
@@ -12,7 +13,6 @@ public class Usuario {
         this.senha = senha;
     }
 
-   
     public int getId() {
         return id;
     }

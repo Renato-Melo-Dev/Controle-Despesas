@@ -5,10 +5,9 @@ import Entidades.Receita;
 import java.util.List;
 
 public class CalcularSaldoTotal {
-    public  double calcularSaldoTotal(DespesaService despesaService, ReceitaService receitaService, List<Despesa> listaDespesas, List<Receita> listaReceitas) {
-        double totalDespesas = despesaService.obterTotalDespesas(listaDespesas);
-        double totalReceitas = receitaService.obterTotalReceitas(listaReceitas);
+    public double calcularSaldoTotal(DespesaService despesaService, ReceitaService receitaService, List<Despesa> despesas, List<Receita> receitas) {
+        double totalDespesas = despesas.stream().mapToDouble(Despesa::getValor).sum();
+        double totalReceitas = receitas.stream().mapToDouble(Receita::getValor).sum();
         return totalReceitas - totalDespesas;
     }
-    
 }

@@ -5,14 +5,12 @@ public class Despesa {
     private String descricao;
     private double valor;
 
-    
     public Despesa(int id, String descricao, double valor) {
         this.id = id;
         this.descricao = descricao;
         this.valor = valor;
     }
 
-    
     public int getId() {
         return id;
     }

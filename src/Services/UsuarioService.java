@@ -2,25 +2,27 @@ package Services;
 
 import Entidades.Usuario;
 import Interfaces.UsuarioRepository;
+
 public class UsuarioService {
-    public UsuarioRepository usuarioRepository;
+    private UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
     public void criarUsuario(Usuario usuario) {
-        usuarioRepository.salvarUsuario(usuario);
-    }
-
-    public Usuario buscarUsuarioPorId(int id) {
-        return usuarioRepository.buscarUsuarioPorId(id);
+        usuarioRepository.criar(usuario);
     }
 
     public boolean autenticarUsuario(String email, String senha) {
-        
-        Usuario usuario = usuarioRepository.buscarUsuarioPorEmail(email);
-        return usuario != null && usuario.getSenha().equals(senha);
+        return usuarioRepository.autenticar(email, senha);
     }
 
+    public UsuarioRepository getUsuarioRepository() {
+        return usuarioRepository;
+    }
+
+    public void setUsuarioRepository(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
 }
