@@ -44,7 +44,7 @@ public class Main {
             System.out.print("Digite o número da opção desejada: ");
 
             int escolha = scanner.nextInt();
-            scanner.nextLine(); // Consumir a quebra de linha
+            scanner.nextLine(); 
             
             switch (escolha) {
                 case 1 -> {
@@ -84,7 +84,7 @@ public class Main {
                 System.out.print("Escolha uma opção: ");
                 
                 int opcao = scanner.nextInt();
-                scanner.nextLine(); // Consumir a quebra de linha
+                scanner.nextLine(); 
 
                 switch (opcao) {
                     case 1 -> {
@@ -92,7 +92,7 @@ public class Main {
                         String descricaoDespesa = scanner.nextLine();
                         System.out.print("Digite o valor da despesa: ");
                         double valorDespesa = scanner.nextDouble();
-                        scanner.nextLine(); // Consumir a quebra de linha
+                        scanner.nextLine(); 
 
                         Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa);
                         despesaService.adicionarDespesa(novaDespesa);
