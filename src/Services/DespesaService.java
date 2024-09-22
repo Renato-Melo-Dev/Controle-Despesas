@@ -2,6 +2,7 @@ package Services;
 
 import Entidades.Despesa;
 import Interfaces.DespesaRepository;
+import java.util.List;
 
 public class DespesaService {
     public DespesaRepository despesaRepository;
@@ -26,6 +27,12 @@ public class DespesaService {
     public void adicionarDespesa(Despesa despesa) {
         despesaRepository.adicionarDespesa(despesa);
     }
-
+    public double obterTotalDespesas(List<Despesa> listaDespesas) {
+        double total = 0.0;
+        for (Despesa despesa : listaDespesas) {
+            total += despesa.getValor();
+        }
+        return total;
     
+}
 }

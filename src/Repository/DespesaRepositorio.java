@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DespesaRepositorio implements DespesaRepository {
-    private final List<Despesa> despesas;
+    public List<Despesa> despesas;
 
     public DespesaRepositorio() {
         this.despesas = new ArrayList<>();
@@ -30,5 +30,13 @@ public class DespesaRepositorio implements DespesaRepository {
     public void adicionarDespesa(Despesa despesa) {
         despesas.add(despesa);
 }
-
+    @Override
+    public void obterTotalDespesas(Despesa despesa) {
+        double total = 0.0;
+        for (Despesa d : despesas) {
+            total += d.getValor();
+        }
+        System.out.println("Total de despesas: " + total);
 }
+}
+

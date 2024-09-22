@@ -3,13 +3,20 @@ import Entidades.Receita;
 import Entidades.Usuario;
 import Interfaces.DespesaRepository;
 import Interfaces.ReceitaRepository;
+import Interfaces.RelatorioRepository;
 import Interfaces.UsuarioRepository;
 import Repository.DespesaRepositorio;
 import Repository.ReceitaRepositorio;
+import Repository.RelatorioRepositorio;
 import Repository.UsuarioRepositorio;
+import Services.CalcularSaldoTotal;
 import Services.DespesaService;
 import Services.ReceitaService;
+import Services.RelatorioService;
 import Services.UsuarioService;
+import Utils.GeradorId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -17,21 +24,28 @@ public class Main {
         DespesaRepository despesaRepository = new DespesaRepositorio();
         ReceitaRepository receitaRepository = new ReceitaRepositorio();
         UsuarioRepository usuarioRepository = new UsuarioRepositorio();
+        RelatorioRepository relatorioRepository = new RelatorioRepositorio();
 
         DespesaService despesaService = new DespesaService(despesaRepository);
         ReceitaService receitaService = new ReceitaService(receitaRepository);
         UsuarioService usuarioService = new UsuarioService(usuarioRepository);
+        RelatorioService relatorioService = new RelatorioService(relatorioRepository);
+
+        List<Despesa> listaDespesas = new ArrayList<>();
+        List<Receita> listaReceitas = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(System.in)) {
             boolean continuarExecucao = true;
-            
+
             System.out.println("Bem-vindo ao Sistema de Gerenciamento!");
             System.out.println("Escolha uma opção:");
             System.out.println("1. Cadastrar");
             System.out.println("2. Fazer login");
             System.out.print("Digite o número da opção desejada: ");
+
             int escolha = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine(); // Consumir a quebra de linha
+            
             switch (escolha) {
                 case 1 -> {
                     System.out.println("Preencha os dados.");
@@ -41,7 +55,7 @@ public class Main {
                     String email = scanner.nextLine();
                     System.out.print("Digite sua senha: ");
                     String senha = scanner.nextLine();
-                    Usuario novoUsuario = new Usuario(1, nome, email, senha);
+                    Usuario novoUsuario = new Usuario(GeradorId.gerarIdUsuario(), nome, email, senha);
                     usuarioService.criarUsuario(novoUsuario);
                     System.out.println("Usuário cadastrado com sucesso!");
                 }
@@ -60,15 +74,17 @@ public class Main {
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
 
-            while (continuarExecucao) { {
+            while (continuarExecucao) {
                 System.out.println("\n--- Sistema de Gerenciamento de Custos ---");
                 System.out.println("1. Adicionar Despesa");
                 System.out.println("2. Adicionar Receita");
-                System.out.println("3. Consultar Saldo Total");
-                System.out.println("4. Sair");
+                System.out.println("3. Consultar Saldo");
+                System.out.println("4. Gerar Relatório");
+                System.out.println("5. Sair");
                 System.out.print("Escolha uma opção: ");
+                
                 int opcao = scanner.nextInt();
-                scanner.nextLine(); 
+                scanner.nextLine(); // Consumir a quebra de linha
 
                 switch (opcao) {
                     case 1 -> {
@@ -76,40 +92,42 @@ public class Main {
                         String descricaoDespesa = scanner.nextLine();
                         System.out.print("Digite o valor da despesa: ");
                         double valorDespesa = scanner.nextDouble();
-                        scanner.nextLine(); 
+                        scanner.nextLine(); // Consumir a quebra de linha
 
-                        Despesa novaDespesa = new Despesa(1, descricaoDespesa, valorDespesa);
+                        Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa);
                         despesaService.adicionarDespesa(novaDespesa);
+                        listaDespesas.add(novaDespesa);
                         System.out.println("Despesa adicionada com sucesso!");
-                        break;
                     }
-
                     case 2 -> {
                         System.out.print("Digite a descrição da receita: ");
                         String descricaoReceita = scanner.nextLine();
                         System.out.print("Digite o valor da receita: ");
                         double valorReceita = scanner.nextDouble();
-                        scanner.nextLine();
+                        scanner.nextLine(); 
                         
-                        Receita novaReceita = new Receita(1, descricaoReceita, valorReceita);
+                        Receita novaReceita = new Receita(GeradorId.gerarIdReceita(), descricaoReceita, valorReceita);
                         receitaService.adicionarReceita(novaReceita);
+                        listaReceitas.add(novaReceita);
                         System.out.println("Receita adicionada com sucesso!");
-                        break;
                     }
-
                     case 3 -> {
+                        CalcularSaldoTotal calculadora = new CalcularSaldoTotal();
+                        double saldoTotal = calculadora.calcularSaldoTotal(despesaService, receitaService, listaDespesas, listaReceitas);
+                        System.out.println("Saldo: R$" + saldoTotal);
                     }
-
                     case 4 -> {
+                        relatorioService.gerarRelatorio(listaDespesas, listaReceitas);
+                    }
+                    case 5 -> {
                         System.out.println("Encerrando o programa. Até mais!");
-                        scanner.close();
                         continuarExecucao = false;
-                        break;
                     }
                     default -> System.out.println("Opção inválida. Tente novamente.");
                 }
             }
-   }
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro: " + e.getMessage());
         }
     }
 }

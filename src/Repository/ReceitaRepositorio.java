@@ -7,28 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReceitaRepositorio implements ReceitaRepository {
-    private final List<Receita> receitas = new ArrayList<>();
-
+        private final List<Receita> listaReceitas;
+    
+        public ReceitaRepositorio() {
+            this.listaReceitas = new ArrayList<>();
+        }
     @Override
     public void salvarReceita(Receita receita) {
-        if (!receitas.contains(receita)) {
-            receitas.add(receita);
+        listaReceitas.add(receita);
         }
-    }
+    
 
     @Override
     public Receita buscarReceitaPorId(long id) {
-        return receitas.stream()
+        return listaReceitas.stream()
                 .filter(r -> r.getId() == id)
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public double calcularTotalReceitas() {
-    return receitas.stream()
-            .mapToDouble(Receita::getValor)
-            .sum();
-}
-
+    public double obterTotalReceitas(Receita receita) {
+        double total = 0.0;
+        for (Receita r : listaReceitas) {
+            total += r.getValor();
+        }
+        return total;
+    }
+ 
 }
