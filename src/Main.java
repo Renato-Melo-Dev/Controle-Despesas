@@ -88,23 +88,48 @@ public class Main {
 
                 switch (opcao) {
                     case 1 -> {
-                        System.out.print("Digite a descrição da despesa: ");
-                        String descricaoDespesa = scanner.nextLine();
-                        System.out.print("Digite o valor da despesa: ");
-                        double valorDespesa = scanner.nextDouble();
-                        scanner.nextLine(); 
+                        boolean valorValido = false;
+                        double valorDespesa = 0;
+                        String descricaoDespesa;
 
+                        System.out.print("Digite a descrição da despesa: ");
+                        descricaoDespesa = scanner.nextLine();
+
+                        while (!valorValido) {
+                            try {
+                                System.out.print("Digite o valor da despesa: ");
+                                valorDespesa = scanner.nextDouble();
+                                scanner.nextLine();
+                                valorValido = true; // O sistema sai do loop se tudo estiver certo
+                            } catch (Exception e) {
+                                System.out.println("Valor inválido. Por favor, digite um número válido.");
+                                scanner.nextLine(); // Aqui o sistema volta a pedir pro usuário digitar se ele errar 
+                            }
+                        }
                         Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa);
                         despesaService.adicionarDespesa(novaDespesa);
                         listaDespesas.add(novaDespesa);
                         System.out.println("Despesa adicionada com sucesso!");
                     }
                     case 2 -> {
+                        boolean valorValido = false;
+                        double valorReceita = 0;
+                        String descricaoReceita;
+
                         System.out.print("Digite a descrição da receita: ");
-                        String descricaoReceita = scanner.nextLine();
-                        System.out.print("Digite o valor da receita: ");
-                        double valorReceita = scanner.nextDouble();
-                        scanner.nextLine(); 
+                        descricaoReceita = scanner.nextLine();
+
+                        while (!valorValido) {
+                            try {
+                                System.out.print("Digite o valor da receita: ");
+                                valorReceita = scanner.nextDouble();
+                                scanner.nextLine(); 
+                                valorValido = true; // Caso o valor inserido estiver correto o loop será encerrado
+                            } catch (Exception e) {
+                                System.out.println("Valor inválido. Por favor, digite um número válido.");
+                                scanner.nextLine(); // Se o usuário errar, o sistema apaga tudo e volta a pedir o valor
+                            }
+                        }
                         
                         Receita novaReceita = new Receita(GeradorId.gerarIdReceita(), descricaoReceita, valorReceita);
                         receitaService.adicionarReceita(novaReceita);
