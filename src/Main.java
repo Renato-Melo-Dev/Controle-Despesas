@@ -18,12 +18,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Classe principal do sistema de gerenciamento de custos.
+ */
 public class Main {
     public static void main(String[] args) {
+        // Inicializa os repositórios para despesas, receitas e usuários.
         DespesaRepository despesaRepository = new DespesaRepositorio();
         ReceitaRepository receitaRepository = new ReceitaRepositorio();
         UsuarioRepository usuarioRepository = new UsuarioRepositorio();
 
+        // Inicializa os serviços correspondentes.
         DespesaService despesaService = new DespesaService(despesaRepository);
         ReceitaService receitaService = new ReceitaService(receitaRepository);
         UsuarioService usuarioService = new UsuarioService(usuarioRepository);
@@ -46,6 +51,7 @@ public class Main {
 
             switch (escolha) {
                 case 1 -> {
+                    // Cadastro de novo usuário
                     System.out.println("Preencha os dados.");
                     System.out.print("Digite seu nome: ");
                     String nome = scanner.nextLine();
@@ -58,6 +64,7 @@ public class Main {
                     System.out.println("Usuário cadastrado com sucesso!");
                 }
                 case 2 -> {
+                    // Login do usuário existente
                     System.out.println("Informe seus dados.");
                     System.out.print("Digite seu email: ");
                     String emailLogin = scanner.nextLine();
@@ -73,6 +80,7 @@ public class Main {
             }
 
             while (continuarExecucao) {
+                // Menu principal do sistema
                 System.out.println("\n--- Sistema de Gerenciamento de Custos ---");
                 System.out.println("1. Adicionar Despesa");
                 System.out.println("2. Listar Despesas");
@@ -88,6 +96,7 @@ public class Main {
 
                 switch (opcao) {
                     case 1 -> {
+                        // Adiciona uma nova despesa
                         System.out.print("Digite a descrição da despesa: ");
                         String descricaoDespesa = scanner.nextLine();
                         double valorDespesa = InputUtils.obterValor(scanner);
@@ -98,6 +107,7 @@ public class Main {
                         System.out.println("Despesa adicionada com sucesso!");
                     }
                     case 2 -> {
+                        // Lista todas as despesas
                         List<Despesa> despesas = despesaService.listarDespesas();
                         System.out.println("Lista de Despesas:");
                         for (Despesa d : despesas) {
@@ -105,6 +115,7 @@ public class Main {
                         }
                     }
                     case 3 -> {
+                        // Atualiza uma despesa existente
                         System.out.print("Digite o ID da despesa a ser atualizada: ");
                         int id = scanner.nextInt();
                         scanner.nextLine(); 
@@ -117,20 +128,24 @@ public class Main {
                         System.out.println("Despesa atualizada com sucesso!");
                     }
                     case 4 -> {
+                        // Deleta uma despesa
                         System.out.print("Digite o ID da despesa a ser deletada: ");
                         int id = scanner.nextInt();
                         despesaService.deletarDespesa(id);
                         System.out.println("Despesa deletada com sucesso!");
                     }
                     case 5 -> {
+                        // Consulta o saldo
                         CalcularSaldoTotal calculadora = new CalcularSaldoTotal();
                         double saldoTotal = calculadora.calcularSaldoTotal(despesaService, receitaService, listaDespesas, listaReceitas);
-                        System.out.println("Saldo: R$" + saldoTotal);
+                        System.out.printf("Saldo: R$%.2f%n", saldoTotal);
                     }
                     case 6 -> {
+                        // Gera um relatório
                         relatorioService.gerarRelatorio(listaDespesas, listaReceitas);
                     }
                     case 7 -> {
+                        // Encerra o programa
                         System.out.println("Encerrando o programa. Até mais!");
                         continuarExecucao = false;
                     }
