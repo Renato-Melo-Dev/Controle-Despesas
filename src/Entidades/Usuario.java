@@ -1,25 +1,19 @@
 package Entidades;
 
 public class Usuario {
-    private int id;
+    private int gerarIdUsuario;
     private String nome;
     private String email;
     private String senha;
 
-    public Usuario(int id, String nome, String email, String senha) {
-        this.id = id;
+    public Usuario(int gerarIdUsuario, String nome, String email, String senha) {
+        this.gerarIdUsuario = gerarIdUsuario;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
     }
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return nome;
@@ -43,5 +37,13 @@ public class Usuario {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public int getGerarIdUsuario() {
+        return gerarIdUsuario;
+    }
+
+    public void setGerarIdUsuario(int gerarIdUsuario) {
+        this.gerarIdUsuario = gerarIdUsuario;
     }
 }

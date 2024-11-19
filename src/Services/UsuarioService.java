@@ -25,4 +25,12 @@ public class UsuarioService {
     public void setUsuarioRepository(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
+
+    public Usuario loginUsuario(String email, String senha) {
+        throw new UnsupportedOperationException("Unimplemented method 'loginUsuario'");
+    }
+
+    public void cadastrarUsuario(Usuario usuario) {
+        throw new UnsupportedOperationException("Unimplemented method 'cadastrarUsuario'");
+    }
 }
