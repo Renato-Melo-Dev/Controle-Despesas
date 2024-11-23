@@ -14,27 +14,23 @@ import Services.RelatorioService;
 import Services.UsuarioService;
 import Utils.GeradorId;
 import Utils.InputUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        // Inicializa os repositórios para despesas, receitas e usuários.
+        // Inicializa os repositórios para despesas, receitas e usuários (agora conectando ao banco de dados).
         DespesaRepository despesaRepository = new DespesaRepositorio();
         ReceitaRepository receitaRepository = new ReceitaRepositorio();
         UsuarioRepository usuarioRepository = new UsuarioRepositorio();
 
-        // Inicializa os serviços correspondentes.
+        // Inicializa os serviços correspondentes, passando os repositórios para eles.
         DespesaService despesaService = new DespesaService(despesaRepository);
         ReceitaService receitaService = new ReceitaService(receitaRepository);
         UsuarioService usuarioService = new UsuarioService(usuarioRepository);
 
-        // Agora instanciamos o RelatorioService com as dependências necessárias
-        RelatorioService relatorioService = new RelatorioService(despesaService, receitaService);
-
-        List<Despesa> listaDespesas = new ArrayList<>();
-        List<Receita> listaReceitas = new ArrayList<>();
+        // Instanciando o RelatorioService para gerar relatórios
+        RelatorioService relatorioService = new RelatorioService();
 
         try (Scanner scanner = new Scanner(System.in)) {
             boolean continuarExecucao = true;
@@ -49,10 +45,8 @@ public class Main {
             scanner.nextLine(); // Limpar buffer
 
             switch (escolha) {
-                case 1 -> // Cadastro de novo usuário
-                    cadastrarUsuario(scanner, usuarioService);
-                case 2 -> // Login do usuário existente
-                    loginUsuario(scanner, usuarioService);
+                case 1 -> cadastrarUsuario(scanner, usuarioService);
+                case 2 -> loginUsuario(scanner, usuarioService);
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
 
@@ -70,16 +64,11 @@ public class Main {
                 scanner.nextLine(); // Limpar buffer
 
                 switch (opcao) {
-                    case 1 -> // Menu de Receitas
-                        menuReceitas(scanner, receitaService, listaReceitas);
-                    case 2 -> // Menu de Despesas
-                        menuDespesas(scanner, despesaService, listaDespesas);
-                    case 3 -> // Consultar Saldo
-                        consultarSaldo(despesaService, receitaService);
-                    case 4 -> // Gerar Relatório
-                        gerarRelatorio(relatorioService, listaDespesas, listaReceitas);
+                    case 1 -> menuReceitas(scanner, receitaService);
+                    case 2 -> menuDespesas(scanner, despesaService);
+                    case 3 -> consultarSaldo(despesaService, receitaService);
+                    case 4 -> gerarRelatorio(relatorioService);
                     case 5 -> {
-                        // Encerra o programa
                         System.out.println("Encerrando o programa. Até mais!");
                         continuarExecucao = false;
                     }
@@ -91,7 +80,7 @@ public class Main {
         }
     }
 
-    private static void menuReceitas(Scanner scanner, ReceitaService receitaService, List<Receita> listaReceitas) {
+    private static void menuReceitas(Scanner scanner, ReceitaService receitaService) {
         boolean continuarReceitas = true;
         while (continuarReceitas) {
             System.out.println("\n--- Menu de Receitas ---");
@@ -105,19 +94,16 @@ public class Main {
             scanner.nextLine(); // Limpar buffer
 
             switch (opcao) {
-                case 1 -> // Adiciona uma nova receita
-                    adicionarReceita(scanner, receitaService, listaReceitas);
-                case 2 -> // Ver receitas
-                    verReceitas(listaReceitas);
-                case 3 -> // Deletar receita
-                    deletarReceita(scanner, receitaService);
-                case 4 -> continuarReceitas = false; // Voltar para o menu principal
+                case 1 -> adicionarReceita(scanner, receitaService);
+                case 2 -> verReceitas(receitaService);
+                case 3 -> deletarReceita(scanner, receitaService);
+                case 4 -> continuarReceitas = false;
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
         }
     }
 
-    private static void menuDespesas(Scanner scanner, DespesaService despesaService, List<Despesa> listaDespesas) {
+    private static void menuDespesas(Scanner scanner, DespesaService despesaService) {
         boolean continuarDespesas = true;
         while (continuarDespesas) {
             System.out.println("\n--- Menu de Despesas ---");
@@ -131,13 +117,10 @@ public class Main {
             scanner.nextLine(); // Limpar buffer
 
             switch (opcao) {
-                case 1 -> // Adiciona uma nova despesa
-                    adicionarDespesa(scanner, despesaService, listaDespesas);
-                case 2 -> // Ver despesas
-                    verDespesas(listaDespesas);
-                case 3 -> // Deletar despesa
-                    deletarDespesa(scanner, despesaService);
-                case 4 -> continuarDespesas = false; // Voltar para o menu principal
+                case 1 -> adicionarDespesa(scanner, despesaService);
+                case 2 -> verDespesas(despesaService);
+                case 3 -> deletarDespesa(scanner, despesaService);
+                case 4 -> continuarDespesas = false;
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
         }
@@ -149,8 +132,8 @@ public class Main {
         System.out.printf("Saldo total: R$ %.2f%n", saldoTotal);
     }
 
-    private static void gerarRelatorio(RelatorioService relatorioService, List<Despesa> listaDespesas, List<Receita> listaReceitas) {
-        relatorioService.gerarRelatorio(listaDespesas, listaReceitas);
+    private static void gerarRelatorio(RelatorioService relatorioService) {
+        relatorioService.gerarRelatorio();
     }
 
     private static void cadastrarUsuario(Scanner scanner, UsuarioService usuarioService) {
@@ -179,46 +162,45 @@ public class Main {
         }
     }
 
-    private static void adicionarReceita(Scanner scanner, ReceitaService receitaService, List<Receita> listaReceitas) {
+    private static void adicionarReceita(Scanner scanner, ReceitaService receitaService) {
         System.out.print("Digite a descrição da receita: ");
         String descricaoReceita = scanner.nextLine();
         double valorReceita = InputUtils.obterValor(scanner);
 
-        Receita novaReceita = new Receita(GeradorId.gerarIdReceita(), descricaoReceita, valorReceita);
+        Receita novaReceita = new Receita(GeradorId.gerarIdReceita(), descricaoReceita, valorReceita, null);
         receitaService.adicionarReceita(novaReceita);
-        listaReceitas.add(novaReceita); // Adiciona à lista de receitas
         System.out.println("Receita adicionada com sucesso!");
     }
 
-    private static void adicionarDespesa(Scanner scanner, DespesaService despesaService, List<Despesa> listaDespesas) {
+    private static void adicionarDespesa(Scanner scanner, DespesaService despesaService) {
         System.out.print("Digite a descrição da despesa: ");
         String descricaoDespesa = scanner.nextLine();
         double valorDespesa = InputUtils.obterValor(scanner);
 
-        Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa);
+        Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa, null);
         despesaService.adicionarDespesa(novaDespesa);
-        listaDespesas.add(novaDespesa); // Adiciona à lista de despesas
         System.out.println("Despesa adicionada com sucesso!");
     }
 
-    private static void verReceitas(List<Receita> listaReceitas) {
+    private static void verReceitas(ReceitaService receitaService) {
         System.out.println("\n--- Lista de Receitas ---");
-        for (Receita receita : listaReceitas) {
-            System.out.printf("ID: %d | Descrição: %s | Valor: R$%.2f%n", receita.getId(), receita.getDescricao(), receita.getValor());
+        List<Receita> receitas = receitaService.listarReceitas();
+        for (Receita receita : receitas) {
+            System.out.printf("ID: %d | Descrição: %s | Valor: R$ %.2f%n", receita.getId(), receita.getDescricao(), receita.getValor());
         }
     }
 
-    private static void verDespesas(List<Despesa> listaDespesas) {
+    private static void verDespesas(DespesaService despesaService) {
         System.out.println("\n--- Lista de Despesas ---");
-        for (Despesa despesa : listaDespesas) {
-            System.out.printf("ID: %d | Descrição: %s | Valor: R$%.2f%n", despesa.getId(), despesa.getDescricao(), despesa.getValor());
+        List<Despesa> despesas = despesaService.listarDespesas();
+        for (Despesa despesa : despesas) {
+            System.out.printf("ID: %d | Descrição: %s | Valor: R$ %.2f%n", despesa.getId(), despesa.getDescricao(), despesa.getValor());
         }
     }
 
     private static void deletarReceita(Scanner scanner, ReceitaService receitaService) {
         System.out.print("Digite o ID da receita que deseja deletar: ");
         int idReceita = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
         receitaService.deletarReceita(idReceita);
         System.out.println("Receita deletada com sucesso!");
     }
@@ -226,7 +208,6 @@ public class Main {
     private static void deletarDespesa(Scanner scanner, DespesaService despesaService) {
         System.out.print("Digite o ID da despesa que deseja deletar: ");
         int idDespesa = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
         despesaService.deletarDespesa(idDespesa);
         System.out.println("Despesa deletada com sucesso!");
     }

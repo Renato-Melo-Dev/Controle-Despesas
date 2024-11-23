@@ -4,13 +4,17 @@ public class Receita {
     private int id;
     private String descricao;
     private double valor;
+    private Categoria categoria;  // Atributo que representa a categoria da receita
 
-    public Receita(int id, String descricao, double valor) {
+    // Construtor
+    public Receita(int id, String descricao, double valor, Categoria categoria) {
         this.id = id;
         this.descricao = descricao;
         this.valor = valor;
+        this.categoria = categoria;  // Inicializando a categoria
     }
 
+    // Getters e setters
     public int getId() {
         return id;
     }
@@ -33,5 +37,15 @@ public class Receita {
 
     public void setValor(double valor) {
         this.valor = valor;
+    }
+
+    // Getter para a categoria (agora retorna um objeto Categoria)
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    // Setter para a categoria (agora aceita um objeto Categoria)
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 }

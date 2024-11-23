@@ -1,48 +1,31 @@
 package Services;
 
-import Entidades.Despesa;
-import Entidades.Receita;
-import java.util.List;
+import Repository.RelatorioRepositorio;
 
 public class RelatorioService {
-    private final DespesaService despesaService;
-    private final ReceitaService receitaService;
 
-    // Construtor que recebe as dependências
-    public RelatorioService(DespesaService despesaService, ReceitaService receitaService) {
-        this.despesaService = despesaService;
-        this.receitaService = receitaService;
+    private RelatorioRepositorio relatorioRepositorio;
+
+    public RelatorioService() {
+        this.relatorioRepositorio = new RelatorioRepositorio();
     }
 
-    // Método para gerar o relatório
-    public void gerarRelatorio(List<Despesa> despesas, List<Receita> receitas) {
-        System.out.println("\n--- Relatório de Gastos e Receitas ---");
-        
-        double totalDespesas = 0;
-        double totalReceitas = 0;
+    public void gerarRelatorio() {
+        double totalDespesas = relatorioRepositorio.obterTotalDespesas();
+        double totalReceitas = relatorioRepositorio.obterTotalReceitas();
+        double saldoTotal = relatorioRepositorio.calcularSaldoTotal();
 
-        System.out.println("Despesas:");
-        for (Despesa despesa : despesas) {
-            System.out.printf("ID: %d, Descrição: %s, Valor: R$%.2f%n", despesa.getId(), despesa.getDescricao(), despesa.getValor());
-            totalDespesas += despesa.getValor();
-        }
-
-        System.out.println("\nReceitas:");
-        for (Receita receita : receitas) {
-            System.out.printf("ID: %d, Descrição: %s, Valor: R$%.2f%n", receita.getId(), receita.getDescricao(), receita.getValor());
-            totalReceitas += receita.getValor();
-        }
-
-        System.out.printf("\nTotal de Despesas: R$%.2f%n", totalDespesas);
-        System.out.printf("Total de Receitas: R$%.2f%n", totalReceitas);
-        System.out.printf("Saldo Total: R$%.2f%n", totalReceitas - totalDespesas);
+        System.out.println("Relatório de Despesas e Receitas");
+        System.out.println("Total Despesas: " + totalDespesas);
+        System.out.println("Total Receitas: " + totalReceitas);
+        System.out.println("Saldo Total: " + saldoTotal);
     }
 
-    public DespesaService getDespesaService() {
-        return despesaService;
+    public RelatorioRepositorio getRelatorioRepositorio() {
+        return relatorioRepositorio;
     }
 
-    public ReceitaService getReceitaService() {
-        return receitaService;
+    public void setRelatorioRepositorio(RelatorioRepositorio relatorioRepositorio) {
+        this.relatorioRepositorio = relatorioRepositorio;
     }
 }
