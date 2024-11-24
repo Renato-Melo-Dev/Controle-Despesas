@@ -3,18 +3,20 @@ package Utils;
 import java.util.Scanner;
 
 public class InputUtils {
+
     public static double obterValor(Scanner scanner) {
-        double valor = 0;
-        boolean valorValido = false;
-        while (!valorValido) {
+        double valor;
+        while (true) {
             try {
                 System.out.print("Digite o valor: ");
-                valor = scanner.nextDouble();
-                scanner.nextLine(); // Limpa o buffer
-                valorValido = true;
-            } catch (Exception e) {
-                System.out.println("Valor inválido. Por favor, digite um número válido.");
-                scanner.nextLine(); // Limpa o buffer em caso de erro
+                valor = Double.parseDouble(scanner.nextLine());
+                if (valor <= 0) {
+                    System.out.println("O valor deve ser maior que zero.");
+                } else {
+                    break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, insira um número válido.");
             }
         }
         return valor;

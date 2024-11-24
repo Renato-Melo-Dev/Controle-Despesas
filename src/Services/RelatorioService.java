@@ -1,5 +1,7 @@
 package Services;
 
+import java.sql.SQLException;
+
 import Repository.RelatorioRepositorio;
 
 public class RelatorioService {
@@ -7,12 +9,12 @@ public class RelatorioService {
     private RelatorioRepositorio relatorioRepositorio;
 
     public RelatorioService() {
-        this.relatorioRepositorio = new RelatorioRepositorio();
+        this.relatorioRepositorio = new RelatorioRepositorio(null);
     }
 
-    public void gerarRelatorio() {
-        double totalDespesas = relatorioRepositorio.obterTotalDespesas();
-        double totalReceitas = relatorioRepositorio.obterTotalReceitas();
+    public void gerarRelatorio() throws SQLException {
+        double totalDespesas = relatorioRepositorio.calcularTotalDespesas();
+        double totalReceitas = relatorioRepositorio.calcularTotalReceitas();
         double saldoTotal = relatorioRepositorio.calcularSaldoTotal();
 
         System.out.println("Relatório de Despesas e Receitas");

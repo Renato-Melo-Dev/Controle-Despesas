@@ -1,53 +1,63 @@
 package Repository;
 
-import Config.ConexaoDB;
-import Entidades.Categoria;
-import Interfaces.CategoriaRepository;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoriaRepositorio implements CategoriaRepository {
+import Entidades.Categoria;
 
-    // Método para adicionar uma nova categoria no banco de dados
-    @Override
-    public void adicionar(Categoria categoria) {
-        String sql = "INSERT INTO categorias (categoria) VALUES (?)";
+public class CategoriaRepositorio {
 
-        try (Connection conn = ConexaoDB.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+    private final Connection connection;
 
+    // Construtor
+    public CategoriaRepositorio(Connection connection) {
+        this.connection = connection;
+    }
+
+    // Método para salvar uma nova categoria
+    public void salvar(Categoria categoria) throws SQLException {
+        String query = "INSERT INTO categorias (nome, descricao) VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, categoria.getNome());
             stmt.executeUpdate();
-            System.out.println("Categoria adicionada com sucesso!");
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao adicionar a categoria: " + e.getMessage());
         }
     }
 
-    // Método para listar todas as categorias no banco de dados
-    @Override
-    public List<Categoria> listar() {
+    // Método para listar todas as categorias
+    public List<Categoria> listar() throws SQLException {
+        String query = "SELECT * FROM categorias";
         List<Categoria> categorias = new ArrayList<>();
-        String sql = "SELECT * FROM categorias";
-
-        try (Connection conn = ConexaoDB.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
+        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                int idCategoria = rs.getInt("idCategoria");
-                String nome = rs.getString("categoria");
-
-                Categoria categoria = new Categoria(idCategoria, nome);
+                Categoria categoria = new Categoria(
+                        rs.getInt("id"),
+                        rs.getString("nome")
+                );
                 categorias.add(categoria);
             }
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar as categorias: " + e.getMessage());
         }
         return categorias;
     }
+    
+    // Método para buscar uma categoria pelo ID
+    public Categoria buscarPorId(int id) throws SQLException {
+        String query = "SELECT * FROM categorias WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Categoria(
+                            rs.getInt("id"),
+                            rs.getString("nome")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 }
-

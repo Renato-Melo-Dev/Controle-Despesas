@@ -1,17 +1,23 @@
 package Utils;
 
 public class GeradorId {
-    private static int idCounter = 1;
+    // Contadores separados para cada tipo
+    private static int idCounterUsuario = 1;
+    private static int idCounterDespesa = 1;
+    private static int idCounterReceita = 1;
 
+    // Método para gerar ID de Usuário
     public static int gerarIdUsuario() {
-        return idCounter++;
+        return idCounterUsuario++;
     }
 
+    // Método para gerar ID de Despesa
     public static int gerarIdDespesa() {
-        return idCounter++;
+        return idCounterDespesa++;
     }
 
+    // Método para gerar ID de Receita
     public static int gerarIdReceita() {
-        return idCounter++;
+        return idCounterReceita++;
     }
 }

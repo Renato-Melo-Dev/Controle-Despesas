@@ -1,22 +1,22 @@
 package Entidades;
 
 public class Categoria {
-    private int idCategoria;  // ID da categoria
-    private String nome;      // Nome da categoria
+    private int id;
+    private String nome;
 
     // Construtor
-    public Categoria(int idCategoria, String nome) {
-        this.idCategoria = idCategoria;
+    public Categoria(int id, String nome) {
+        this.id = id;
         this.nome = nome;
     }
 
     // Getters e Setters
     public int getId() {
-        return idCategoria;  // Retorna o ID da categoria
+        return id;
     }
 
-    public void setId(int idCategoria) {
-        this.idCategoria = idCategoria;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNome() {

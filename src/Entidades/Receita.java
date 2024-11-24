@@ -1,20 +1,26 @@
 package Entidades;
 
+import java.time.LocalDate;
+
 public class Receita {
     private int id;
     private String descricao;
     private double valor;
-    private Categoria categoria;  // Atributo que representa a categoria da receita
+    private LocalDate data;
+    private int idUsuario;
+    private Categoria categoria;
 
-    // Construtor
-    public Receita(int id, String descricao, double valor, Categoria categoria) {
+    // Construtor atualizado
+    public Receita(int id, String descricao, double valor, LocalDate data, int idUsuario, Categoria categoria) {
         this.id = id;
         this.descricao = descricao;
         this.valor = valor;
-        this.categoria = categoria;  // Inicializando a categoria
+        this.data = data;
+        this.idUsuario = idUsuario;
+        this.categoria = categoria;
     }
 
-    // Getters e setters
+    // Getters e Setters
     public int getId() {
         return id;
     }
@@ -39,12 +45,26 @@ public class Receita {
         this.valor = valor;
     }
 
-    // Getter para a categoria (agora retorna um objeto Categoria)
+    public LocalDate getData() {
+        return data;
+    }
+
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
+
+    public int getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
     public Categoria getCategoria() {
         return categoria;
     }
 
-    // Setter para a categoria (agora aceita um objeto Categoria)
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }

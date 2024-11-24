@@ -1,19 +1,14 @@
 package Interfaces;
 
-import Entidades.Despesa;
 import java.util.List;
 
+import Entidades.Despesa;
+
 public interface DespesaRepository {
-
-    // Método para adicionar uma nova despesa
-    void adicionar(Despesa despesa);
-
-    // Método para listar todas as despesas
+    void salvar(Despesa despesa);
     List<Despesa> listar();
-
-    // Método para atualizar uma despesa existente
+    double calcularTotal();
+    void adicionar(Despesa despesa);
     void atualizar(Despesa despesa);
-
-    // Método para deletar uma despesa por ID
-    void deletar(int id);
+    boolean deletar(int id);
 }

@@ -1,10 +1,10 @@
-package Interfaces;
+package Services;
 
 import java.util.List;
 
 import Entidades.Categoria;
 
-public interface CategoriaRepository {
+public interface CategoriaService {
     void salvar(Categoria categoria);
     List<Categoria> listar();
 }
