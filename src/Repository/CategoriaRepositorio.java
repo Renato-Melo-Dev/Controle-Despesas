@@ -5,10 +5,10 @@ import Interfaces.iCategoriaRepositorio;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoriaRepository implements iCategoriaRepositorio {
+public class CategoriaRepositorio implements iCategoriaRepositorio {
     private List<Categoria> categorias;
 
-    public CategoriaRepository() {
+    public CategoriaRepositorio() {
         this.categorias = new ArrayList<>();
         // Exemplos de categorias
         categorias.add(new Categoria(1, "Alimentação", null));

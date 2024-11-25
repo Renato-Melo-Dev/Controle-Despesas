@@ -1,6 +1,6 @@
 import Entidades.Categoria;
 import Entidades.Despesa;
-import Repository.CategoriaRepository;
+import Repository.CategoriaRepositorio;
 import Repository.DespesaRepositorio;
 import Services.CategoriaService;
 import Services.DespesaService;
@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             // Criar instâncias dos repositórios e serviços
-            CategoriaRepository categoriaRepository = new CategoriaRepository();
+            CategoriaRepositorio categoriaRepository = new CategoriaRepositorio();
             CategoriaService categoriaService = new CategoriaService(categoriaRepository);
             DespesaRepositorio despesaRepositorio = new DespesaRepositorio();
             DespesaService despesaService = new DespesaService(despesaRepositorio, categoriaService);
