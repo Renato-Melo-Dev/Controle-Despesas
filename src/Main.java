@@ -1,233 +1,131 @@
+import Entidades.Categoria;
 import Entidades.Despesa;
-import Entidades.Receita;
-import Entidades.Usuario;
-import Interfaces.DespesaRepository;
-import Interfaces.ReceitaRepository;
-import Interfaces.UsuarioRepository;
+import Repository.CategoriaRepository;
 import Repository.DespesaRepositorio;
-import Repository.ReceitaRepositorio;
-import Repository.UsuarioRepositorio;
-import Services.CalcularSaldoTotal;
+import Services.CategoriaService;
 import Services.DespesaService;
-import Services.ReceitaService;
-import Services.RelatorioService;
-import Services.UsuarioService;
-import Utils.GeradorId;
-import Utils.InputUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        // Inicializa os repositórios para despesas, receitas e usuários.
-        DespesaRepository despesaRepository = new DespesaRepositorio();
-        ReceitaRepository receitaRepository = new ReceitaRepositorio();
-        UsuarioRepository usuarioRepository = new UsuarioRepositorio();
-
-        // Inicializa os serviços correspondentes.
-        DespesaService despesaService = new DespesaService(despesaRepository);
-        ReceitaService receitaService = new ReceitaService(receitaRepository);
-        UsuarioService usuarioService = new UsuarioService(usuarioRepository);
-
-        // Agora instanciamos o RelatorioService com as dependências necessárias
-        RelatorioService relatorioService = new RelatorioService(despesaService, receitaService);
-
-        List<Despesa> listaDespesas = new ArrayList<>();
-        List<Receita> listaReceitas = new ArrayList<>();
-
         try (Scanner scanner = new Scanner(System.in)) {
-            boolean continuarExecucao = true;
+            // Criar instâncias dos repositórios e serviços
+            CategoriaRepository categoriaRepository = new CategoriaRepository();
+            CategoriaService categoriaService = new CategoriaService(categoriaRepository);
+            DespesaRepositorio despesaRepositorio = new DespesaRepositorio();
+            DespesaService despesaService = new DespesaService(despesaRepositorio, categoriaService);
 
-            System.out.println("Bem-vindo ao Sistema de Gerenciamento!");
-            System.out.println("Escolha uma opção:");
-            System.out.println("1. Cadastrar");
-            System.out.println("2. Fazer login");
-            System.out.print("Digite o número da opção desejada: ");
+            // Adicionar algumas categorias para o teste
+            categoriaRepository.adicionar(new Categoria(1, "Alimentação", null));
+            categoriaRepository.adicionar(new Categoria(2, "Transporte", null));
+            categoriaRepository.adicionar(new Categoria(3, "Saúde", null));
+            categoriaRepository.adicionar(new Categoria(4, "Lazer", null));
 
-            int escolha = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            boolean continuar = true;
 
-            switch (escolha) {
-                case 1 -> // Cadastro de novo usuário
-                    cadastrarUsuario(scanner, usuarioService);
-                case 2 -> // Login do usuário existente
-                    loginUsuario(scanner, usuarioService);
-                default -> System.out.println("Opção inválida. Tente novamente.");
-            }
+            while (continuar) {
+                System.out.println("\nMenu Principal:");
+                System.out.println("1. Gerenciar Despesas");
+                System.out.println("2. Calcular Saldo");
+                System.out.println("3. Listar Despesas");
+                System.out.println("4. Sair");
 
-            while (continuarExecucao) {
-                // Menu principal do sistema
-                System.out.println("\n--- Sistema de Gerenciamento de Custos ---");
-                System.out.println("1. Receitas");
-                System.out.println("2. Despesas");
-                System.out.println("3. Consultar Saldo");
-                System.out.println("4. Gerar Relatório");
-                System.out.println("5. Sair");
                 System.out.print("Escolha uma opção: ");
-
                 int opcao = scanner.nextInt();
-                scanner.nextLine(); // Limpar buffer
+                scanner.nextLine();  // Limpar buffer
 
                 switch (opcao) {
-                    case 1 -> // Menu de Receitas
-                        menuReceitas(scanner, receitaService, listaReceitas);
-                    case 2 -> // Menu de Despesas
-                        menuDespesas(scanner, despesaService, listaDespesas);
-                    case 3 -> // Consultar Saldo
-                        consultarSaldo(despesaService, receitaService);
-                    case 4 -> // Gerar Relatório
-                        gerarRelatorio(relatorioService, listaDespesas, listaReceitas);
-                    case 5 -> {
-                        // Encerra o programa
-                        System.out.println("Encerrando o programa. Até mais!");
-                        continuarExecucao = false;
-                    }
-                    default -> System.out.println("Opção inválida. Tente novamente.");
+                    case 1 -> gerenciarDespesas(scanner, despesaService); // Gerenciar despesas
+                    case 2 -> calcularSaldo(despesaService);  // Calcular saldo considerando despesas
+                    case 3 -> listarDespesas(despesaService);  // Listar despesas
+                    case 4 -> continuar = false;
+                    default -> System.out.println("Opção inválida! Tente novamente.");
                 }
             }
-        } catch (Exception e) {
-            System.out.println("Ocorreu um erro: " + e.getMessage());
         }
     }
 
-    private static void menuReceitas(Scanner scanner, ReceitaService receitaService, List<Receita> listaReceitas) {
-        boolean continuarReceitas = true;
-        while (continuarReceitas) {
-            System.out.println("\n--- Menu de Receitas ---");
-            System.out.println("1. Adicionar Receita");
-            System.out.println("2. Ver Receitas");
-            System.out.println("3. Deletar Receita");
-            System.out.println("4. Voltar");
-            System.out.print("Escolha uma opção: ");
-
-            int opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
-
-            switch (opcao) {
-                case 1 -> // Adiciona uma nova receita
-                    adicionarReceita(scanner, receitaService, listaReceitas);
-                case 2 -> // Ver receitas
-                    verReceitas(listaReceitas);
-                case 3 -> // Deletar receita
-                    deletarReceita(scanner, receitaService);
-                case 4 -> continuarReceitas = false; // Voltar para o menu principal
-                default -> System.out.println("Opção inválida. Tente novamente.");
-            }
-        }
-    }
-
-    private static void menuDespesas(Scanner scanner, DespesaService despesaService, List<Despesa> listaDespesas) {
-        boolean continuarDespesas = true;
-        while (continuarDespesas) {
-            System.out.println("\n--- Menu de Despesas ---");
+    // Método para gerenciar despesas
+    private static void gerenciarDespesas(Scanner scanner, DespesaService despesaService) {
+        boolean continuar = true;
+        while (continuar) {
+            System.out.println("\nGerenciar Despesas:");
             System.out.println("1. Adicionar Despesa");
-            System.out.println("2. Ver Despesas");
-            System.out.println("3. Deletar Despesa");
-            System.out.println("4. Voltar");
-            System.out.print("Escolha uma opção: ");
+            System.out.println("2. Remover Despesa");
+            System.out.println("3. Voltar");
 
+            System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpar buffer
+            scanner.nextLine();  // Limpar buffer
 
             switch (opcao) {
-                case 1 -> // Adiciona uma nova despesa
-                    adicionarDespesa(scanner, despesaService, listaDespesas);
-                case 2 -> // Ver despesas
-                    verDespesas(listaDespesas);
-                case 3 -> // Deletar despesa
-                    deletarDespesa(scanner, despesaService);
-                case 4 -> continuarDespesas = false; // Voltar para o menu principal
-                default -> System.out.println("Opção inválida. Tente novamente.");
+                case 1 -> adicionarDespesa(scanner, despesaService);  // Adicionar nova despesa
+                case 2 -> removerDespesa(scanner, despesaService);  // Remover despesa existente
+                case 3 -> continuar = false;
+                default -> System.out.println("Opção inválida! Tente novamente.");
             }
         }
     }
 
-    private static void consultarSaldo(DespesaService despesaService, ReceitaService receitaService) {
-        CalcularSaldoTotal calculadora = new CalcularSaldoTotal(despesaService, receitaService);
-        double saldoTotal = calculadora.calcularSaldoTotal();
-        System.out.printf("Saldo total: R$ %.2f%n", saldoTotal);
-    }
-
-    private static void gerarRelatorio(RelatorioService relatorioService, List<Despesa> listaDespesas, List<Receita> listaReceitas) {
-        relatorioService.gerarRelatorio(listaDespesas, listaReceitas);
-    }
-
-    private static void cadastrarUsuario(Scanner scanner, UsuarioService usuarioService) {
-        System.out.println("Preencha os dados.");
-        System.out.print("Digite seu nome: ");
-        String nome = scanner.nextLine();
-        System.out.print("Digite seu email: ");
-        String email = scanner.nextLine();
-        System.out.print("Digite sua senha: ");
-        String senha = scanner.nextLine();
-        Usuario novoUsuario = new Usuario(GeradorId.gerarIdUsuario(), nome, email, senha);
-        usuarioService.criarUsuario(novoUsuario);
-        System.out.println("Usuário cadastrado com sucesso!");
-    }
-
-    private static void loginUsuario(Scanner scanner, UsuarioService usuarioService) {
-        System.out.println("Informe seus dados.");
-        System.out.print("Digite seu email: ");
-        String emailLogin = scanner.nextLine();
-        System.out.print("Digite sua senha: ");
-        String senhaLogin = scanner.nextLine();
-        if (usuarioService.autenticarUsuario(emailLogin, senhaLogin)) {
-            System.out.println("Login bem-sucedido!");
-        } else {
-            System.out.println("Email ou senha incorretos. Tente novamente.");
-        }
-    }
-
-    private static void adicionarReceita(Scanner scanner, ReceitaService receitaService, List<Receita> listaReceitas) {
-        System.out.print("Digite a descrição da receita: ");
-        String descricaoReceita = scanner.nextLine();
-        double valorReceita = InputUtils.obterValor(scanner);
-
-        Receita novaReceita = new Receita(GeradorId.gerarIdReceita(), descricaoReceita, valorReceita);
-        receitaService.adicionarReceita(novaReceita);
-        listaReceitas.add(novaReceita); // Adiciona à lista de receitas
-        System.out.println("Receita adicionada com sucesso!");
-    }
-
-    private static void adicionarDespesa(Scanner scanner, DespesaService despesaService, List<Despesa> listaDespesas) {
+    // Método para adicionar uma despesa
+    private static void adicionarDespesa(Scanner scanner, DespesaService despesaService) {
         System.out.print("Digite a descrição da despesa: ");
-        String descricaoDespesa = scanner.nextLine();
-        double valorDespesa = InputUtils.obterValor(scanner);
+        String descricao = scanner.nextLine();
+        System.out.print("Digite o valor da despesa: ");
+        double valor = scanner.nextDouble();
+        scanner.nextLine();  // Limpar buffer
 
-        Despesa novaDespesa = new Despesa(GeradorId.gerarIdDespesa(), descricaoDespesa, valorDespesa);
-        despesaService.adicionarDespesa(novaDespesa);
-        listaDespesas.add(novaDespesa); // Adiciona à lista de despesas
-        System.out.println("Despesa adicionada com sucesso!");
-    }
+        // Obter a categoria a partir das opções disponíveis
+        System.out.println("\nEscolha a categoria:");
+        List<Categoria> categorias = despesaService.getCategoriaService().listarCategorias();
+        for (Categoria categoria : categorias) {
+            System.out.println(categoria.getId() + ". " + categoria.getNome());
+        }
+        System.out.print("Digite o ID da categoria: ");
+        int categoriaId = scanner.nextInt();
+        scanner.nextLine();  // Limpar buffer
 
-    private static void verReceitas(List<Receita> listaReceitas) {
-        System.out.println("\n--- Lista de Receitas ---");
-        for (Receita receita : listaReceitas) {
-            System.out.printf("ID: %d | Descrição: %s | Valor: R$%.2f%n", receita.getId(), receita.getDescricao(), receita.getValor());
+        Categoria categoriaEscolhida = despesaService.getCategoriaService().buscarCategoriaPorId(categoriaId);
+        if (categoriaEscolhida != null) {
+            // Gerar ID automático para a despesa
+            Despesa despesa = new Despesa(despesaService.gerarIdDespesa(), descricao, valor, categoriaEscolhida);
+            despesaService.adicionarDespesa(despesa);
+            System.out.println("Despesa adicionada com sucesso!");
+        } else {
+            System.out.println("Categoria inválida.");
         }
     }
 
-    private static void verDespesas(List<Despesa> listaDespesas) {
-        System.out.println("\n--- Lista de Despesas ---");
-        for (Despesa despesa : listaDespesas) {
-            System.out.printf("ID: %d | Descrição: %s | Valor: R$%.2f%n", despesa.getId(), despesa.getDescricao(), despesa.getValor());
+    // Método para remover uma despesa
+    private static void removerDespesa(Scanner scanner, DespesaService despesaService) {
+        System.out.print("Digite o ID da despesa a ser removida: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();  // Limpar buffer
+        boolean sucesso = despesaService.removerDespesa(id);
+        if (sucesso) {
+            System.out.println("Despesa removida com sucesso!");
+        } else {
+            System.out.println("Despesa não encontrada.");
         }
     }
 
-    private static void deletarReceita(Scanner scanner, ReceitaService receitaService) {
-        System.out.print("Digite o ID da receita que deseja deletar: ");
-        int idReceita = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
-        receitaService.deletarReceita(idReceita);
-        System.out.println("Receita deletada com sucesso!");
+    // Método para calcular o saldo de despesas
+    private static void calcularSaldo(DespesaService despesaService) {
+        double saldo = despesaService.calcularSaldo();
+        System.out.println("Saldo total de despesas: R$ " + saldo);
     }
 
-    private static void deletarDespesa(Scanner scanner, DespesaService despesaService) {
-        System.out.print("Digite o ID da despesa que deseja deletar: ");
-        int idDespesa = scanner.nextInt();
-        scanner.nextLine(); // Limpar buffer
-        despesaService.deletarDespesa(idDespesa);
-        System.out.println("Despesa deletada com sucesso!");
+    // Método para listar as despesas
+    private static void listarDespesas(DespesaService despesaService) {
+        List<Despesa> despesas = despesaService.listarDespesas();
+        System.out.println("\nLista de Despesas:");
+        if (despesas.isEmpty()) {
+            System.out.println("Nenhuma despesa registrada.");
+        } else {
+            for (Despesa despesa : despesas) {
+                System.out.println(despesa);
+            }
+        }
     }
 }

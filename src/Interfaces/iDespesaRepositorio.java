@@ -3,9 +3,9 @@ package Interfaces;
 import Entidades.Despesa;
 import java.util.List;
 
-public interface DespesaRepository {
+public interface iDespesaRepositorio {
     void adicionar(Despesa despesa);
+    Despesa buscar(int id);
     List<Despesa> listar();
-    void atualizar(Despesa despesa);
-    void deletar(int id);
+    boolean deletar(Despesa despesa);
 }
